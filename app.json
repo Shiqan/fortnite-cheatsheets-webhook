@@ -1,0 +1,8 @@
+{
+    "name": "fortnite-cheatsheets-webhook",
+    "description": "Simple application which pushes new Fortnite cheatsheets by thesquatingdog to a Discord webhook",
+    "repository": "https://github.com/Shiqan/fortnite-cheatsheets-webhook",
+    "logo": "http://via.placeholder.com/350x150",
+    "keywords": ["python", "fortnite", "thesquatingdog", "cheatsheets"]
+  }
+  

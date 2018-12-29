@@ -10,7 +10,7 @@ from worker import conn
 sched = BlockingScheduler()
 q = Queue(connection=conn)
 
-interval = int(os.getenv('SCHEDULE_INTERVAL', 1))
+interval = int(os.getenv('SCHEDULE_INTERVAL', 30))
 
 
 @sched.scheduled_job('interval', minutes=interval)
