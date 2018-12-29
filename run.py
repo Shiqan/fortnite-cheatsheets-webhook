@@ -1,9 +1,9 @@
 import asyncio
 import logging
 import os
-import redis
 
 import aiohttp
+import redis
 from discord_webhook import DiscordEmbed, DiscordWebhook
 
 from dataclasses import dataclass
@@ -18,19 +18,23 @@ class CheatSheet:
     permalink: str
 
 
+log = logging.getLogger()
+log.setLevel(os.getenv('LOG_LEVEL', 'DEBUG'))
+
 # Create webhook
-webhook = DiscordWebhook(url=os.getenv(
-    'WEBHOOK_URL', 'https://discordapp.com/api/webhooks/528592348939157504/sY0Jc9MpBxsRKNUQVXxz31bV23nXmGdzLpNs4R84sjJXRTmsBqzjJidn23Rw4dXB_u52'))
+webhook = DiscordWebhook(url=os.getenv('WEBHOOK_URL', ''))
 
 # conn.delete('cache')
 redis_cache = conn.lrange('cache', 0, -1) or []
 cache = [i.decode() for i in redis_cache]
 
+
 def add_to_cache(sheets):
     conn.lpush('cache', *sheets)
 
+
 def parse_cheat_sheets(feed):
-    logging.info('parsing feed...')
+    log.info('parsing feed...')
     sheets = []
 
     data = feed.get('data', [])
@@ -45,7 +49,7 @@ def parse_cheat_sheets(feed):
             if sheet.get('id') not in cache:
                 sheets.append(CheatSheet(id=sheet.get('id'), title=sheet.get('title'), url=sheet.get(
                     'url'), permalink=sheet.get('permalink')))
-    
+
     if sheets:
         add_to_cache(sheet.id for sheet in sheets)
     return sheets
@@ -60,7 +64,7 @@ async def fetch(session):
 
 async def gather_posts():
     logging.info('gathering posts...')
-    async with aiohttp.ClientSession() as session:
+    async with aiohttp.ClientSession(headers={'User-agent': 'fortnite-cheatsheets-webhook 0.1'}) as session:
         feed = await fetch(session)
         sheets = parse_cheat_sheets(feed)
         for sheet in sheets:

@@ -9,12 +9,12 @@ autopep8 = "*"
 rope = "*"
 
 [packages]
-asyncio = "*"
-aiohttp = "*"
 redis = "*"
 rq = "*"
 apscheduler = "*"
 discord-webhook = "*"
+asyncio = "*"
+aiohttp = "*"
 
 [requires]
 python_version = "3.7"

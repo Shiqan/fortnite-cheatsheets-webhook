@@ -1,4 +1,5 @@
-import logging
+import os
+import time 
 
 from apscheduler.schedulers.blocking import BlockingScheduler
 from rq import Queue
@@ -9,10 +10,11 @@ from worker import conn
 sched = BlockingScheduler()
 q = Queue(connection=conn)
 
+interval = os.getenv('SCHEDULE_INTERVAL', 1)
 
-@sched.scheduled_job('interval', minutes=1)
+
+@sched.scheduled_job('interval', minutes=interval)
 def run_gather_posts():
-    logging.info('enqueued gather posts')
     q.enqueue(gather_posts)
 
 
