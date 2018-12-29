@@ -1,0 +1,20 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+pylint = "*"
+autopep8 = "*"
+rope = "*"
+
+[packages]
+asyncio = "*"
+aiohttp = "*"
+redis = "*"
+rq = "*"
+apscheduler = "*"
+discord-webhook = "*"
+
+[requires]
+python_version = "3.7"
