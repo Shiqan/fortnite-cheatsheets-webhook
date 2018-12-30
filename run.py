@@ -1,8 +1,7 @@
-import asyncio
 import logging
 import os
 
-import aiohttp
+import requests
 import redis
 from discord_webhook import DiscordEmbed, DiscordWebhook
 
@@ -55,24 +54,22 @@ def parse_cheat_sheets(feed):
     return sheets
 
 
-async def fetch(session):
+def fetch():
     user = os.getenv('REDDIT_USER', 'thesquatingdog')
     url = f'http://api.reddit.com/user/{user}/submitted/?sort=new'
-    async with session.get(url) as response:
-        return await response.json()
+    response = requests.get(url, headers={'User-agent': 'fortnite-cheatsheets-webhook 0.1'})
+    return response.json()
 
 
-async def gather_posts():
+def gather_posts():
     logging.info('gathering posts...')
-    async with aiohttp.ClientSession(headers={'User-agent': 'fortnite-cheatsheets-webhook 0.1'}) as session:
-        feed = await fetch(session)
-        sheets = parse_cheat_sheets(feed)
-        for sheet in sheets:
-            embed = DiscordEmbed(title=sheet.title)
-            embed.set_image(url=sheet.url)
-            webhook.add_embed(embed)
-            webhook.execute()
+    feed = fetch()
+    sheets = parse_cheat_sheets(feed)
+    for sheet in sheets:
+        embed = DiscordEmbed(title=sheet.title)
+        embed.set_image(url=sheet.url)
+        webhook.add_embed(embed)
+        webhook.execute()
 
 if __name__ == '__main__':
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(gather_posts())
+    gather_posts()
