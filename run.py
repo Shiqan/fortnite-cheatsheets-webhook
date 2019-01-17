@@ -1,12 +1,11 @@
 import logging
 import os
 
-import requests
 import redis
+import requests
 from discord_webhook import DiscordEmbed, DiscordWebhook
 
 from dataclasses import dataclass
-from worker import conn
 
 
 @dataclass
@@ -23,7 +22,10 @@ log.setLevel(os.getenv('LOG_LEVEL', 'DEBUG'))
 # Create webhook
 webhook = DiscordWebhook(url=os.getenv('WEBHOOK_URL', ''))
 
-# conn.delete('cache')
+# Redis cache
+redis_url = os.getenv('REDISTOGO_URL', 'redis://localhost:6379')
+conn = redis.from_url(redis_url)
+
 redis_cache = conn.lrange('cache', 0, -1) or []
 cache = [i.decode() for i in redis_cache]
 
@@ -57,7 +59,8 @@ def parse_cheat_sheets(feed):
 def fetch():
     user = os.getenv('REDDIT_USER', 'thesquatingdog')
     url = f'http://api.reddit.com/user/{user}/submitted/?sort=new'
-    response = requests.get(url, headers={'User-agent': 'fortnite-cheatsheets-webhook 0.1'})
+    response = requests.get(
+        url, headers={'User-agent': 'fortnite-cheatsheets-webhook 0.1'})
     return response.json()
 
 
@@ -70,6 +73,7 @@ def gather_posts():
         embed.set_image(url=sheet.url)
         webhook.add_embed(embed)
         webhook.execute()
+
 
 if __name__ == '__main__':
     gather_posts()
