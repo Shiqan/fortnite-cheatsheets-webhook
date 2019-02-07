@@ -26,11 +26,15 @@ webhook = DiscordWebhook(url=os.getenv('WEBHOOK_URL', ''))
 redis_url = os.getenv('REDISTOGO_URL', 'redis://localhost:6379')
 conn = redis.from_url(redis_url)
 
-redis_cache = conn.lrange('cache', 0, -1) or []
-cache = [i.decode() for i in redis_cache]
+
+def get_cache():
+    redis_cache = conn.lrange('cache', 0, -1) or []
+    log.debug(f"Number of items in cache: {len(redis_cache)}")
+    return [i.decode() for i in redis_cache]
 
 
 def add_to_cache(sheets):
+    log.debug(f"Adding to cache {sheets}")
     conn.lpush('cache', *sheets)
 
 
@@ -47,7 +51,7 @@ def parse_cheat_sheets(feed):
         cheatsheets = [post for post in fortnite_posts if 'challanges' in post.get(
             'title', '').lower() or 'cheat sheet' in post.get('title', '').lower()]
         for sheet in cheatsheets:
-            if sheet.get('id') not in cache:
+            if sheet.get('id') not in get_cache():
                 sheets.append(CheatSheet(id=sheet.get('id'), title=sheet.get('title'), url=sheet.get(
                     'url'), permalink=sheet.get('permalink')))
 
