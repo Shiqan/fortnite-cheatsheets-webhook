@@ -77,6 +77,7 @@ def gather_posts():
         embed.set_image(url=sheet.url)
         webhook.add_embed(embed)
         webhook.execute()
+        webhook.remove_embed(-1)
 
 
 if __name__ == '__main__':
